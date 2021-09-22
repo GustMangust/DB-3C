@@ -1,8 +1,10 @@
 package com.example.lab4;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class MainActivity extends AppCompatActivity {
     private boolean exists;
@@ -51,8 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        output(f);
-
+        readTxtFile(f);
         try{
             fw = new FileWriter(f,true);
             bw = new BufferedWriter(fw);
@@ -63,32 +66,32 @@ public class MainActivity extends AppCompatActivity {
     }
     public void click(View view){
         try{
-            Log.d("LOG",editText1.getText().toString());
-            bw.append(editText1.getText().toString()+";"+editText2.getText().toString()+";"+"\r\n");
-            Log.d("LOG","Данные записаны");
-            output(f);
+            FileWriter writer = new FileWriter(f, true);
+            writer.append(editText1.getText().toString()+";"+editText2.getText().toString()+";"+"\n");
+            writer.flush();
+            writer.close();
+            readTxtFile(f);
         }catch (IOException e){
             e.printStackTrace();
         }
 
     }
-    private void output(File f){
-        try {
-            fr = new FileReader(f);
-            br = new BufferedReader(fr);
-            String allLines = "";
-            String line = null;
-            while ((line=br.readLine())!=null){
-                allLines+=line;
+
+    public void readTxtFile(File fileName) {
+        try{
+            FileReader inputFile = new FileReader(fileName);
+            BufferedReader bufferReader = new BufferedReader(inputFile);
+            String line = "", allLines = "";
+            while ((line = bufferReader.readLine()) != null)   {
+                allLines += line + "\n";
             }
-            Log.d("LOG11",allLines);
             textView.setText(allLines);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            bufferReader.close();
+        }catch(Exception e){
+            System.out.println("Error while reading file line by line:" + e.getMessage());
         }
 
     }
+
 
 }
